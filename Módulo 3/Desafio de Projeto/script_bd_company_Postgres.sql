@@ -11,15 +11,13 @@ CREATE TABLE employee(
 	Fname varchar(15) not null,
     Minit char,
     Lname varchar(15) not null,
-    Ssn char(9) not null, 
+    Ssn char(9) PRIMARY KEY, 
     Bdate date,
     Address varchar(30),
     Sex char,
-    Salary decimal(10,2),
+    Salary decimal(10,2) CONSTRAINT chk_salary_employee check (Salary> 2000.0),
     Super_ssn char(9),
-    Dno int not null,
-    constraint chk_salary_employee check (Salary> 2000.0),
-    constraint pk_employee primary key (Ssn)
+    Dno integer NOT NULL
 );
 
 alter table employee 
@@ -28,19 +26,17 @@ alter table employee
     on delete set null
     on update cascade;
 
-alter table employee modify Dno int not null default 1;
+--alter table employee modify Dno int not null default 1;
+ALTER TABLE employee ALTER COLUMN Dno SET DEFAULT 1;
 
 desc employee;
 
 create table departament(
-	Dname varchar(15) not null,
-    Dnumber int not null,
+	Dname varchar(15) not null constraint unique_name_dept unique,
+    Dnumber int constraint pk_dept primary key,
     Mgr_ssn char(9) not null,
     Mgr_start_date date, 
-    Dept_create_date date,
-    constraint chk_date_dept check (Dept_create_date < Mgr_start_date),
-    constraint pk_dept primary key (Dnumber),
-    constraint unique_name_dept unique(Dname),
+    Dept_create_date date constraint chk_date_dept check (Dept_create_date < Mgr_start_date),
     foreign key (Mgr_ssn) references employee(Ssn)
 );
 
@@ -60,7 +56,8 @@ create table dept_locations(
     constraint fk_dept_locations foreign key (Dnumber) references departament (Dnumber)
 );
 
-alter table dept_locations drop foreign key fk_dept_locations;
+--alter table dept_locations drop foreign key fk_dept_locations;
+alter table dept_locations drop constraint fk_dept_locations;
 
 alter table dept_locations 
 	add constraint fk_dept_locations foreign key (Dnumber) references departament(Dnumber)
